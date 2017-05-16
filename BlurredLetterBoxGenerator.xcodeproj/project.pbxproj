@@ -14,6 +14,9 @@
 		BBBF83B51EC97E9200152A16 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBBF83B31EC97E9200152A16 /* LaunchScreen.storyboard */; };
 		BBBF83C01EC97E9200152A16 /* BlurredLetterBoxGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBF83BF1EC97E9200152A16 /* BlurredLetterBoxGeneratorTests.swift */; };
 		BBBF83CB1EC97E9200152A16 /* BlurredLetterBoxGeneratorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBF83CA1EC97E9200152A16 /* BlurredLetterBoxGeneratorUITests.swift */; };
+		BBBF83D91EC97F9A00152A16 /* BlurredLetterBoxGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBF83D81EC97F9A00152A16 /* BlurredLetterBoxGenerator.swift */; };
+		BBBF83DB1EC9803900152A16 /* AVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBF83DA1EC9803900152A16 /* AVPlayerView.swift */; };
+		BBBF83DD1EC9D1F600152A16 /* VideoFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBF83DC1EC9D1F600152A16 /* VideoFileManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +50,9 @@
 		BBBF83C61EC97E9200152A16 /* BlurredLetterBoxGeneratorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlurredLetterBoxGeneratorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBBF83CA1EC97E9200152A16 /* BlurredLetterBoxGeneratorUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurredLetterBoxGeneratorUITests.swift; sourceTree = "<group>"; };
 		BBBF83CC1EC97E9200152A16 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BBBF83D81EC97F9A00152A16 /* BlurredLetterBoxGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurredLetterBoxGenerator.swift; sourceTree = SOURCE_ROOT; };
+		BBBF83DA1EC9803900152A16 /* AVPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AVPlayerView.swift; path = ../AVPlayerView.swift; sourceTree = "<group>"; };
+		BBBF83DC1EC9D1F600152A16 /* VideoFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoFileManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +103,9 @@
 		BBBF83A91EC97E9200152A16 /* BlurredLetterBoxGenerator */ = {
 			isa = PBXGroup;
 			children = (
+				BBBF83DA1EC9803900152A16 /* AVPlayerView.swift */,
+				BBBF83D81EC97F9A00152A16 /* BlurredLetterBoxGenerator.swift */,
+				BBBF83DC1EC9D1F600152A16 /* VideoFileManager.swift */,
 				BBBF83AA1EC97E9200152A16 /* AppDelegate.swift */,
 				BBBF83AC1EC97E9200152A16 /* ViewController.swift */,
 				BBBF83AE1EC97E9200152A16 /* Main.storyboard */,
@@ -262,8 +271,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBBF83DB1EC9803900152A16 /* AVPlayerView.swift in Sources */,
 				BBBF83AD1EC97E9200152A16 /* ViewController.swift in Sources */,
 				BBBF83AB1EC97E9200152A16 /* AppDelegate.swift in Sources */,
+				BBBF83DD1EC9D1F600152A16 /* VideoFileManager.swift in Sources */,
+				BBBF83D91EC97F9A00152A16 /* BlurredLetterBoxGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -5,6 +5,22 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BBBF83A61EC97E9200152A16"
+               BuildableName = "BlurredLetterBoxGenerator.app"
+               BlueprintName = "BlurredLetterBoxGenerator"
+               ReferencedContainer = "container:BlurredLetterBoxGenerator.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
    </BuildAction>
    <TestAction
       buildConfiguration = "Debug"
@@ -12,7 +28,36 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BBBF83BA1EC97E9200152A16"
+               BuildableName = "BlurredLetterBoxGeneratorTests.xctest"
+               BlueprintName = "BlurredLetterBoxGeneratorTests"
+               ReferencedContainer = "container:BlurredLetterBoxGenerator.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BBBF83C51EC97E9200152A16"
+               BuildableName = "BlurredLetterBoxGeneratorUITests.xctest"
+               BlueprintName = "BlurredLetterBoxGeneratorUITests"
+               ReferencedContainer = "container:BlurredLetterBoxGenerator.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "BBBF83A61EC97E9200152A16"
+            BuildableName = "BlurredLetterBoxGenerator.app"
+            BlueprintName = "BlurredLetterBoxGenerator"
+            ReferencedContainer = "container:BlurredLetterBoxGenerator.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -26,6 +71,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "BBBF83A61EC97E9200152A16"
+            BuildableName = "BlurredLetterBoxGenerator.app"
+            BlueprintName = "BlurredLetterBoxGenerator"
+            ReferencedContainer = "container:BlurredLetterBoxGenerator.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -35,6 +90,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "BBBF83A61EC97E9200152A16"
+            BuildableName = "BlurredLetterBoxGenerator.app"
+            BlueprintName = "BlurredLetterBoxGenerator"
+            ReferencedContainer = "container:BlurredLetterBoxGenerator.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
