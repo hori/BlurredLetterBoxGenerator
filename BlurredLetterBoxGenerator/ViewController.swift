@@ -51,16 +51,13 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
     picker.dismiss(animated: true, completion: nil)
     guard let url = info["UIImagePickerControllerReferenceURL"] as? URL else { return }
     
-//    let asset = AVAsset(url: url)
-//    let playerItem = AVPlayerItem(asset: asset)
-//    let player = AVPlayer(playerItem: playerItem)
-//    playerView.player = player
-//    player.play()
-    
+    let startTime = CMTime.init(seconds: 1.0, preferredTimescale: Int32(NSEC_PER_SEC))
+    let endTime = CMTime.init(seconds: 5.0, preferredTimescale: Int32(NSEC_PER_SEC))
+    let timeRange = CMTimeRange.init(start: startTime, end: endTime)
     fileManager.remove(to: .normarized)
     let generator = BlurredLetterBoxGenerator(AVAsset(url: url))
     generator.delegate = self
-    generator.export(to: fileManager.url(of: .normarized), outputSize: CGSize.init(width: 540, height: 960))
+    generator.export(to: fileManager.url(of: .normarized), outputSize: CGSize.init(width: 540, height: 960), timeRange: timeRange)
   }
 }
 

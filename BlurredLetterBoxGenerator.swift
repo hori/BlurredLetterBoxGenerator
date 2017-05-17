@@ -28,53 +28,52 @@ class BlurredLetterBoxGenerator {
     self.asset = asset
   }
   
+  func canselExport() {
+    guard let session = exportSession else { return }
+    switch session.status {
+    case .exporting:
+      session.cancelExport()
+    default: break
+    }
+  }
+  
   func export(to url: URL, outputSize: CGSize, timeRange: CMTimeRange? = nil) {
     guard let videoTrack = asset.tracks(withMediaType: AVMediaTypeVideo).first,
+          let audioTrack = asset.tracks(withMediaType: AVMediaTypeAudio).first,
           let videoSize = videoSize() else {
       delegate?.blurredLetterBoxGeneratorDidFailExportMovie()
       return
     }
     
-    let trimTimeRange = CMTimeRange.init(start: timeRange?.start ?? kCMTimeZero, duration: timeRange?.end ?? asset.duration)
+    // Valid TimeRange
+    var startTime = timeRange?.start ?? kCMTimeZero
+    startTime = startTime < kCMTimeZero ? kCMTimeZero : startTime
+    var endTime = timeRange?.end ?? asset.duration
+    endTime = endTime > asset.duration ? asset.duration : endTime
+    let trimTimeRange = CMTimeRange.init(start: startTime, end: endTime)
 
+    // Mixing Composition
     let mixComposition = AVMutableComposition()
-
-//    let filter = CIFilter(name: "CIGaussianBlur")!
-//    filter.setValue(100.0, forKey: kCIInputRadiusKey)
-//    let blurredLayer = CALayer()
-//    blurredLayer.frame = CGRect.init(origin: .zero, size: outputSize)
-//    blurredLayer.filters = [filter]
-
-//    let filter = CIFilter(name: "CIGaussianBlur")!
-//    let blurredVideoComposition = AVMutableVideoComposition.init(asset: mixComposition, applyingCIFiltersWithHandler: { request in
-//      let source = request.sourceImage.clampingToExtent()
-//      filter.setValue(source, forKey: kCIInputImageKey)
-//      filter.setValue(100.0, forKey: kCIInputRadiusKey)
-//      let output = filter.outputImage!
-//      request.finish(with: output, context: nil)
-//    })
-
-//    let blurredAnimationTool = AVVideoCompositionCoreAnimationTool.init(additionalLayer: blurredLayer, asTrackID: 2)
-//    let blurredAnimationTool = AVVideoCompositionCoreAnimationTool.init(postProcessingAsVideoLayer: blurredLayer, in: blurredLayer)
-//    blurredVideoComposition.animationTool = blurredAnimationTool
 
     let videoComposition = AVMutableVideoComposition()
     videoComposition.frameDuration = videoTrack.minFrameDuration
     videoComposition.renderSize = outputSize
     
-    // CompositionTrack
+    // Composition Track
     let fgTrack: AVMutableCompositionTrack = mixComposition.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: 1)
     let bgTrack: AVMutableCompositionTrack = mixComposition.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: 2)
+    let audioCompTrack: AVMutableCompositionTrack = mixComposition.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID: kCMPersistentTrackID_Invalid)
 
     do {
       try fgTrack.insertTimeRange(trimTimeRange, of: videoTrack, at: kCMTimeZero)
       try bgTrack.insertTimeRange(trimTimeRange, of: videoTrack, at: kCMTimeZero)
+      try audioCompTrack.insertTimeRange(trimTimeRange, of: audioTrack, at: kCMTimeZero)
     } catch {
       delegate?.blurredLetterBoxGeneratorDidFailExportMovie()
       return
     }
     
-    // LayerInstructions
+    // Layer Instructions
     let fgLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: fgTrack)
     let bgLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: bgTrack)
     
@@ -139,7 +138,7 @@ class BlurredLetterBoxGenerator {
     // Opacity
     bgLayerInstruction.setOpacity(0.2, at: kCMTimeZero)
 
-    // VideoInstruction
+    // Video Instruction
     let videoInstruction = AVMutableVideoCompositionInstruction()
     videoInstruction.timeRange = CMTimeRange.init(start: kCMTimeZero, duration: trimTimeRange.duration)
 
@@ -157,9 +156,17 @@ class BlurredLetterBoxGenerator {
     
     observeExportProgressTimer = Timer.scheduledTimer(timeInterval: 0.05, target: self, selector: #selector(observeExportProgress(_:)), userInfo: nil, repeats: true)
     
-    exportSession?.exportAsynchronously { [weak self] in
-      self?.observeExportProgressTimer?.invalidate()
-      self?.delegate?.blurredLetterBoxGeneratorDidCompleteExportMovie()
+    exportSession?.exportAsynchronously { //[weak self] in
+      DispatchQueue.main.sync { [weak self] in
+        self?.observeExportProgressTimer?.invalidate()
+        if self?.exportSession?.status == .completed {
+          self?.delegate?.blurredLetterBoxGeneratorDidCompleteExportMovie()
+          self?.exportSession = nil
+        } else {
+          self?.delegate?.blurredLetterBoxGeneratorDidFailExportMovie()
+          self?.exportSession = nil
+        }
+      }
     }
     
   }
