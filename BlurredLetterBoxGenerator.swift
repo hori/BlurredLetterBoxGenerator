@@ -39,22 +39,33 @@ class BlurredLetterBoxGenerator {
 
     let mixComposition = AVMutableComposition()
 
-    // BlurredLayer
 //    let filter = CIFilter(name: "CIGaussianBlur")!
 //    filter.setValue(100.0, forKey: kCIInputRadiusKey)
 //    let blurredLayer = CALayer()
 //    blurredLayer.frame = CGRect.init(origin: .zero, size: outputSize)
 //    blurredLayer.filters = [filter]
-//    
-//    let blurredVideoComposition = AVMutableVideoComposition()
-//    blurredVideoComposition.animationTool = AVVideoCompositionCoreAnimationTool.init(additionalLayer: blurredLayer, asTrackID: 2)
-//    
-//    let test = blurredVideoComposition.addMutableTrack
+
+//    let filter = CIFilter(name: "CIGaussianBlur")!
+//    let blurredVideoComposition = AVMutableVideoComposition.init(asset: mixComposition, applyingCIFiltersWithHandler: { request in
+//      let source = request.sourceImage.clampingToExtent()
+//      filter.setValue(source, forKey: kCIInputImageKey)
+//      filter.setValue(100.0, forKey: kCIInputRadiusKey)
+//      let output = filter.outputImage!
+//      request.finish(with: output, context: nil)
+//    })
+
+//    let blurredAnimationTool = AVVideoCompositionCoreAnimationTool.init(additionalLayer: blurredLayer, asTrackID: 2)
+//    let blurredAnimationTool = AVVideoCompositionCoreAnimationTool.init(postProcessingAsVideoLayer: blurredLayer, in: blurredLayer)
+//    blurredVideoComposition.animationTool = blurredAnimationTool
+
+    let videoComposition = AVMutableVideoComposition()
+    videoComposition.frameDuration = videoTrack.minFrameDuration
+    videoComposition.renderSize = outputSize
     
-    
+    // CompositionTrack
     let fgTrack: AVMutableCompositionTrack = mixComposition.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: 1)
     let bgTrack: AVMutableCompositionTrack = mixComposition.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: 2)
-    
+
     do {
       try fgTrack.insertTimeRange(trimTimeRange, of: videoTrack, at: kCMTimeZero)
       try bgTrack.insertTimeRange(trimTimeRange, of: videoTrack, at: kCMTimeZero)
@@ -63,18 +74,11 @@ class BlurredLetterBoxGenerator {
       return
     }
     
-    // VideoInstruction
-    let videoInstruction = AVMutableVideoCompositionInstruction()
-    videoInstruction.timeRange = CMTimeRange.init(start: kCMTimeZero, duration: trimTimeRange.duration)
-    
     // LayerInstructions
-    let fgLayerInstruction = AVMutableVideoCompositionLayerInstruction.init(assetTrack: fgTrack)
-    let bgLayerInstruction = AVMutableVideoCompositionLayerInstruction.init(assetTrack: bgTrack)
+    let fgLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: fgTrack)
+    let bgLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: bgTrack)
     
     // Transform
-    var fgTransform = videoTransform()
-    var bgTransform = videoTransform()
-    
     let viewW: CGFloat
     let viewH: CGFloat
     switch asset.videoOrientation(){
@@ -105,44 +109,51 @@ class BlurredLetterBoxGenerator {
       fgScale = outputSize.width / viewW
       bgScale = outputSize.height / viewH
       fgOffsetX = 0
-      fgOffsetY = (outputSize.height - (viewH * fgScale)) / 2 / fgScale
-      bgOffsetX = (outputSize.width - (viewW * bgScale)) / 2 / bgScale
+      fgOffsetY = (outputSize.height - (viewH * fgScale)) / 2
+      bgOffsetX = (outputSize.width - (viewW * bgScale)) / 2
       bgOffsetY = 0
     } else {
       // Letterbox is Left & Right
       fgScale = outputSize.height / viewH
       bgScale = outputSize.width / viewW
-      fgOffsetX = (outputSize.width - (viewW * fgScale)) / 2 / fgScale
+      fgOffsetX = (outputSize.width - (viewW * fgScale)) / 2
       fgOffsetY = 0
       bgOffsetX = 0
-      bgOffsetY = (outputSize.height - (viewH * bgScale)) / 2 / bgScale
+      bgOffsetY = (outputSize.height - (viewH * bgScale)) / 2
     }
+
+    let t = videoTransform()
     
-    print("outputSize:", outputSize)
-    print("viewW,viewH:", viewW, viewH)
-    print(fgScale,bgScale,fgOffsetX,fgOffsetY)
-    
-    fgTransform = fgTransform.scaledBy(x: fgScale, y: fgScale).translatedBy(x: fgOffsetX, y: fgOffsetY)
-    bgTransform = bgTransform.scaledBy(x: bgScale , y: bgScale).translatedBy(x: bgOffsetX, y: bgOffsetY)
-    
+    let fgTScale = CGAffineTransform(scaleX: fgScale, y: fgScale)
+    let bgTScale = CGAffineTransform(scaleX: bgScale, y: bgScale)
+    let fgTMove = CGAffineTransform(translationX: fgOffsetX, y: fgOffsetY)
+    let bgTMove = CGAffineTransform(translationX: bgOffsetX, y: bgOffsetY)
+
+    let fgTransform = t.concatenating(fgTScale).concatenating(fgTMove)
+    let bgTransform = t.concatenating(bgTScale).concatenating(bgTMove)
+
     // Add Transfrom
     fgLayerInstruction.setTransform(fgTransform, at: kCMTimeZero)
     bgLayerInstruction.setTransform(bgTransform, at: kCMTimeZero)
+    
+    // Opacity
+    bgLayerInstruction.setOpacity(0.2, at: kCMTimeZero)
 
+    // VideoInstruction
+    let videoInstruction = AVMutableVideoCompositionInstruction()
+    videoInstruction.timeRange = CMTimeRange.init(start: kCMTimeZero, duration: trimTimeRange.duration)
+
+    // Connect Instructions
+    fgLayerInstruction.trackID = 1
+    bgLayerInstruction.trackID = 2
     videoInstruction.layerInstructions = [fgLayerInstruction, bgLayerInstruction]
+    videoComposition.instructions = [videoInstruction]
 
-    // OutputComposition
-    let outputComposition = AVMutableVideoComposition()
-    outputComposition.instructions = [videoInstruction]
-    outputComposition.frameDuration = videoTrack.minFrameDuration
-    outputComposition.renderSize = outputSize
-    
-    
     // Export
     exportSession = AVAssetExportSession.init(asset: mixComposition, presetName: AVAssetExportPresetHighestQuality)
     exportSession?.outputURL = url
     exportSession?.outputFileType = AVFileTypeMPEG4
-    exportSession?.videoComposition = outputComposition
+    exportSession?.videoComposition = videoComposition
     
     observeExportProgressTimer = Timer.scheduledTimer(timeInterval: 0.05, target: self, selector: #selector(observeExportProgress(_:)), userInfo: nil, repeats: true)
     
@@ -160,7 +171,7 @@ class BlurredLetterBoxGenerator {
   
   fileprivate func videoTransform() -> CGAffineTransform {
     guard let track = asset.tracks(withMediaType: AVMediaTypeVideo).first else { return CGAffineTransform() }
-    var transform = track.preferredTransform
+    let transform = track.preferredTransform
     return transform
   }
   
